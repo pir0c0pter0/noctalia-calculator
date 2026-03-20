@@ -65,7 +65,6 @@ widget_entry = {
     "defaultSettings": {
         "enabled": True,
         "language": "auto",
-        "maxHistory": 6,
         "precision": 8,
         "showBarValue": True
     }

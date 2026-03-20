@@ -12,7 +12,6 @@ ColumnLayout {
     property bool valueEnabled: pluginApi?.pluginSettings?.enabled ?? true
     property bool valueShowBarValue: pluginApi?.pluginSettings?.showBarValue ?? true
     property int valuePrecision: pluginApi?.pluginSettings?.precision ?? 8
-    property int valueMaxHistory: pluginApi?.pluginSettings?.maxHistory ?? 6
     property string valueLanguage: pluginApi?.pluginSettings?.language ?? "auto"
 
     property int _langVersion: 0
@@ -36,7 +35,6 @@ ColumnLayout {
         pluginApi.pluginSettings.enabled = valueEnabled;
         pluginApi.pluginSettings.showBarValue = valueShowBarValue;
         pluginApi.pluginSettings.precision = valuePrecision;
-        pluginApi.pluginSettings.maxHistory = valueMaxHistory;
         pluginApi.pluginSettings.language = valueLanguage;
         pluginApi.saveSettings();
         mainInst?.reloadLanguage(valueLanguage);
@@ -139,28 +137,6 @@ ColumnLayout {
             value: root.valuePrecision
             onMoved: {
                 root.valuePrecision = Math.round(value);
-                root.saveSettings();
-            }
-        }
-    }
-
-    ColumnLayout {
-        Layout.fillWidth: true
-        spacing: Style.marginS
-
-        NLabel {
-            label: t("settings.history") + ": " + root.valueMaxHistory
-            description: t("settings.history-desc")
-        }
-
-        NSlider {
-            Layout.fillWidth: true
-            from: 3
-            to: 10
-            stepSize: 1
-            value: root.valueMaxHistory
-            onMoved: {
-                root.valueMaxHistory = Math.round(value);
                 root.saveSettings();
             }
         }

@@ -12,7 +12,6 @@ Item {
     readonly property bool enabled: settings.enabled ?? defaults.enabled ?? true
     readonly property bool showBarValue: settings.showBarValue ?? defaults.showBarValue ?? true
     readonly property int precision: settings.precision ?? defaults.precision ?? 8
-    readonly property int maxHistory: settings.maxHistory ?? defaults.maxHistory ?? 6
     readonly property string language: settings.language ?? defaults.language ?? "auto"
 
     property string _currentLang: ""
@@ -25,12 +24,10 @@ Item {
     property bool justEvaluated: false
     property bool errorState: false
     property string lastExpression: ""
-    property var historyEntries: []
 
     readonly property bool hasExpression: tokens.length > 0 || currentInput !== "0" || justEvaluated
     readonly property string displayText: errorState ? t("state.error") : currentInput
     readonly property string expressionText: expressionPreview()
-    readonly property var historyFeed: buildHistoryFeed()
     readonly property string badgeText: (!enabled || !showBarValue) ? "" : compactDisplay(displayText, 9)
 
     readonly property var _enStrings: ({
@@ -53,9 +50,6 @@ Item {
             "keyboard-ready": "Keyboard ready",
             "keyboard-hint": "Enter = solve   Backspace = delete   Esc = clear",
             "mouse-hint": "Click any key below or type directly.",
-            "history": "Recent results",
-            "no-history": "No calculations yet.",
-            "clear-history": "Clear history",
             "expression-idle": "Start typing or click a button",
             "disabled-note": "The calculator is disabled. Use the toggle to turn it back on.",
             "live-value": "Live value"
@@ -67,8 +61,6 @@ Item {
             "show-bar-desc": "Display the current value next to the calculator icon",
             "precision": "Decimal precision",
             "precision-desc": "Maximum decimals used when formatting results",
-            "history": "Recent history size",
-            "history-desc": "How many results are kept in the floating panel",
             "language": "Language",
             "language-desc": "Plugin display language",
             "lang-auto": "Auto",
@@ -99,9 +91,6 @@ Item {
             "keyboard-ready": "Teclado ativo",
             "keyboard-hint": "Enter = calcular   Backspace = apagar   Esc = limpar",
             "mouse-hint": "Clique nas teclas abaixo ou digite direto.",
-            "history": "Resultados recentes",
-            "no-history": "Ainda sem contas.",
-            "clear-history": "Limpar historico",
             "expression-idle": "Comece digitando ou clique em um botao",
             "disabled-note": "A calculadora esta desativada. Use o toggle para ligar de novo.",
             "live-value": "Valor ao vivo"
@@ -113,8 +102,6 @@ Item {
             "show-bar-desc": "Exibe o valor atual ao lado do icone da calculadora",
             "precision": "Precisao decimal",
             "precision-desc": "Maximo de casas decimais ao formatar resultados",
-            "history": "Tamanho do historico",
-            "history-desc": "Quantos resultados ficam salvos no painel flutuante",
             "language": "Idioma",
             "language-desc": "Idioma de exibicao do plugin",
             "lang-auto": "Auto",
@@ -128,13 +115,6 @@ Item {
     Component.onCompleted: _loadTranslations()
 
     onLanguageChanged: _loadTranslations()
-
-    onMaxHistoryChanged: {
-        const limit = Math.max(1, maxHistory);
-        if (historyEntries.length > limit) {
-            historyEntries = historyEntries.slice(0, limit);
-        }
-    }
 
     function _resolveLanguage() {
         if (language !== "auto") return language;
@@ -236,10 +216,6 @@ Item {
         justEvaluated = false;
         errorState = false;
         lastExpression = "";
-    }
-
-    function clearHistory() {
-        historyEntries = [];
     }
 
     function _resetAfterError() {
@@ -497,44 +473,6 @@ Item {
         return _formatExpression(built);
     }
 
-    function previewHistoryEntry() {
-        if (errorState || justEvaluated || tokens.length === 0) return null;
-
-        const expression = expressionPreview();
-        if (expression === "") return null;
-
-        let result = "";
-        if (!shouldResetInput) {
-            const evaluationTokens = _buildEvaluationTokens();
-            if (evaluationTokens.length >= 3) {
-                const numeric = _evaluateTokenArray(evaluationTokens);
-                if (numeric !== null) {
-                    const formatted = _numberToString(numeric);
-                    if (formatted !== null) result = formatted;
-                }
-            }
-        }
-
-        return {
-            "expression": expression,
-            "result": result,
-            "isPreview": true,
-            "historyIndex": -1
-        };
-    }
-
-    function buildHistoryFeed() {
-        const preview = previewHistoryEntry();
-        const savedEntries = historyEntries.map((entry, index) => ({
-            "expression": entry.expression,
-            "result": entry.result,
-            "isPreview": false,
-            "historyIndex": index
-        }));
-        if (preview) return [preview].concat(savedEntries);
-        return savedEntries;
-    }
-
     function evaluate() {
         if (!enabled || errorState) return;
 
@@ -553,11 +491,6 @@ Item {
             _setError();
             return;
         }
-
-        historyEntries = [{
-            "expression": expression,
-            "result": formatted
-        }].concat(historyEntries).slice(0, Math.max(1, maxHistory));
 
         currentInput = formatted;
         tokens = [];
@@ -650,16 +583,5 @@ Item {
         }
         text += "\n" + t("bar.tooltip-shortcuts");
         return text;
-    }
-
-    function recallHistory(index) {
-        const entry = historyEntries[index];
-        if (!entry) return;
-        tokens = [];
-        currentInput = entry.result;
-        shouldResetInput = false;
-        justEvaluated = true;
-        errorState = false;
-        lastExpression = entry.expression;
     }
 }

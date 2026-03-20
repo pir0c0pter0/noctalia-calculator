@@ -22,7 +22,6 @@
       "enabled": true,
       "showBarValue": true,
       "precision": 8,
-      "maxHistory": 6,
       "language": "auto"
     }
   }
