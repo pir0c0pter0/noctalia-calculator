@@ -9,7 +9,7 @@ FocusScope {
     property var pluginApi: null
     readonly property var geometryPlaceholder: panelContainer
     property real contentPreferredWidth: 360 * Style.uiScaleRatio
-    property real contentPreferredHeight: 410 * Style.uiScaleRatio
+    property real contentPreferredHeight: Math.ceil(panelCard.implicitHeight + (Style.marginM * 2))
     readonly property bool allowAttach: true
 
     anchors.fill: parent
@@ -137,10 +137,12 @@ FocusScope {
             spacing: Style.marginM
 
             NBox {
+                id: panelCard
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                implicitHeight: Math.ceil(cardContent.implicitHeight + (Style.marginM * 2))
 
                 ColumnLayout {
+                    id: cardContent
                     anchors.fill: parent
                     anchors.margins: Style.marginM
                     spacing: Style.marginM
@@ -217,7 +219,6 @@ FocusScope {
 
                     GridLayout {
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
                         columns: 4
                         rowSpacing: Style.marginS
                         columnSpacing: Style.marginS
@@ -229,9 +230,9 @@ FocusScope {
                                 required property var modelData
 
                                 Layout.fillWidth: true
-                                Layout.fillHeight: true
                                 Layout.columnSpan: modelData.span
-                                Layout.minimumHeight: modelData.action === "equals" ? 58 : 52
+                                Layout.preferredHeight: modelData.action === "equals" ? 58 : 52
+                                Layout.minimumHeight: Layout.preferredHeight
 
                                 readonly property bool isFlashed: root.flashedAction === modelData.action
                                 radius: Style.radiusL
