@@ -67,7 +67,7 @@ Item {
             "lang-en": "English",
             "lang-pt": "Portuguese",
             "shortcuts": "Shortcuts",
-            "shortcuts-desc": "Numbers, operators, Enter, Backspace, Esc/Delete, % and F9."
+            "shortcuts-desc": "Panel toggle on Niri: Mod+Shift+C. Input: numbers, operators, Enter, Backspace, Esc/Delete, % and F9."
         }
     })
 
@@ -108,7 +108,7 @@ Item {
             "lang-en": "Ingles",
             "lang-pt": "Portugues",
             "shortcuts": "Atalhos",
-            "shortcuts-desc": "Numeros, operadores, Enter, Backspace, Esc/Delete, % e F9."
+            "shortcuts-desc": "Abrir painel no Niri: Mod+Shift+C. Entrada: numeros, operadores, Enter, Backspace, Esc/Delete, % e F9."
         }
     })
 

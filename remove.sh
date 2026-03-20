@@ -10,6 +10,7 @@ PLUGINS_DIR="${NOCTALIA_DIR}/plugins"
 TARGET_DIR="${PLUGINS_DIR}/${PLUGIN_DIR_NAME}"
 PLUGINS_FILE="${NOCTALIA_DIR}/plugins.json"
 SETTINGS_FILE="${NOCTALIA_DIR}/settings.json"
+NIRI_KEYBINDS_FILE="${CONFIG_HOME}/niri/cfg/keybinds.kdl"
 
 python3 - "$PLUGINS_FILE" "$SETTINGS_FILE" "$PLUGIN_ID" <<'PY'
 import json
@@ -55,6 +56,31 @@ for section in ("left", "center", "right"):
         ]
 
 save_json(settings_file, settings)
+PY
+
+python3 - "$NIRI_KEYBINDS_FILE" <<'PY'
+import os
+import re
+import sys
+
+keybinds_file = sys.argv[1]
+managed_pattern = re.compile(
+    r'(?ms)^[ \t]*// >>> noctalia-calculator start >>>\n.*?^[ \t]*// <<< noctalia-calculator end <<<\n?'
+)
+
+if not os.path.exists(keybinds_file):
+    raise SystemExit(0)
+
+with open(keybinds_file, "r", encoding="utf-8") as handle:
+    content = handle.read()
+
+updated = managed_pattern.sub("", content, count=1)
+updated = re.sub(r"\n{3,}", "\n\n", updated)
+
+if updated != content:
+    with open(keybinds_file, "w", encoding="utf-8") as handle:
+        handle.write(updated)
+    print('Removed managed Niri keybind: Mod+Shift+C')
 PY
 
 if [ -L "$TARGET_DIR" ] && [ "$(readlink -f "$TARGET_DIR")" = "$SCRIPT_DIR" ]; then

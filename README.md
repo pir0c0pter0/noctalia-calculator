@@ -30,6 +30,7 @@ The installer will:
 - link the plugin into `~/.config/noctalia/plugins/noctalia-calculator`
 - enable the plugin in `~/.config/noctalia/plugins.json`
 - add `plugin:noctalia-calculator` to the right side of the bar in `~/.config/noctalia/settings.json`
+- add a `Mod+Shift+C` bind in `~/.config/niri/cfg/keybinds.kdl` when that file exists and the shortcut is free
 
 After that, restart Noctalia / Quickshell if it is not reloaded automatically.
 
@@ -53,6 +54,7 @@ This removes the plugin from Noctalia settings and unlinks it from the local plu
 
 - Left click the bar widget to open the calculator
 - Right click the bar widget for the context menu
+- `Mod+Shift+C` toggles the panel from Niri and opens it next to the calculator icon when the bar widget is available
 - Keyboard:
   - `0-9` for digits
   - `+ - * /` for operators
