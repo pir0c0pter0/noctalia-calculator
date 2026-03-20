@@ -1,0 +1,29 @@
+{
+  "id": "noctalia-calculator",
+  "name": "Calculator",
+  "version": "1.0.0",
+  "minNoctaliaVersion": "4.4.0",
+  "author": "Pir0c0pter0",
+  "license": "MIT",
+  "description": "Theme-aware calculator plugin for Noctalia on Niri with bar widget, floating panel and keyboard support",
+  "tags": ["Bar", "Panel", "Utility"],
+  "entryPoints": {
+    "main": "Main.qml",
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml",
+    "settings": "Settings.qml"
+  },
+  "dependencies": {
+    "plugins": []
+  },
+  "metadata": {
+    "commandPrefix": "calculator",
+    "defaultSettings": {
+      "enabled": true,
+      "showBarValue": true,
+      "precision": 8,
+      "maxHistory": 6,
+      "language": "auto"
+    }
+  }
+}
