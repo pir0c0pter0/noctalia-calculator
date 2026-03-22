@@ -129,37 +129,9 @@ ColumnLayout {
         }
     }
 
-    Rectangle {
+    NLabel {
         Layout.fillWidth: true
-        radius: Style.radiusM
-        color: Qt.alpha(Color.mPrimary, 0.08)
-        border.color: Qt.alpha(Color.mPrimary, 0.24)
-        border.width: 1
-
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Style.marginM
-            spacing: Style.marginXS
-
-            NText {
-                text: t("settings.info")
-                font.bold: true
-                color: Color.mPrimary
-            }
-
-            NText {
-                Layout.fillWidth: true
-                text: t("settings.shortcuts-desc")
-                wrapMode: Text.WordWrap
-                color: Qt.alpha(Color.mOnSurface, 0.75)
-            }
-
-            NText {
-                Layout.fillWidth: true
-                text: t("settings.developed-by")
-                wrapMode: Text.WordWrap
-                color: Qt.alpha(Color.mOnSurface, 0.75)
-            }
-        }
+        label: t("settings.about")
+        description: t("settings.developed-by") + "<br>" + t("settings.auto-language-desc")
     }
 }

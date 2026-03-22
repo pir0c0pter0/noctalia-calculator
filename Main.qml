@@ -50,7 +50,7 @@ Item {
             "live-value": "Live value"
         },
         "settings": {
-            "info": "Information",
+            "about": "About",
             "show-bar": "Show value in bar",
             "show-bar-desc": "Display the current value next to the calculator icon",
             "precision": "Decimal precision",
@@ -60,9 +60,8 @@ Item {
             "lang-auto": "Auto",
             "lang-en": "English",
             "lang-pt": "Portuguese (Brazil)",
-            "shortcuts": "Shortcuts",
-            "shortcuts-desc": "Panel toggle on Niri: Mod+Shift+C. Input: numbers, operators, Enter, Backspace, Esc/Delete, % and F9.",
-            "developed-by": "Developed by Pir0c0pter0"
+            "developed-by": "Developed by Pir0c0pter0",
+            "auto-language-desc": "Automatic translation follows your system language while Auto is selected."
         }
     })
 
@@ -87,7 +86,7 @@ Item {
             "live-value": "Valor ao vivo"
         },
         "settings": {
-            "info": "Informacoes",
+            "about": "Sobre",
             "show-bar": "Mostrar valor na barra",
             "show-bar-desc": "Exibe o valor atual ao lado do icone da calculadora",
             "precision": "Precisao decimal",
@@ -97,9 +96,8 @@ Item {
             "lang-auto": "Auto",
             "lang-en": "Ingles",
             "lang-pt": "Portugues (Brasil)",
-            "shortcuts": "Atalhos",
-            "shortcuts-desc": "Abrir painel no Niri: Mod+Shift+C. Entrada: numeros, operadores, Enter, Backspace, Esc/Delete, % e F9.",
-            "developed-by": "Desenvolvido por Pir0c0pter0"
+            "developed-by": "Desenvolvido por Pir0c0pter0",
+            "auto-language-desc": "A traducao automatica segue o idioma do sistema quando Auto estiver selecionado."
         }
     })
 
