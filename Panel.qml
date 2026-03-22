@@ -66,7 +66,7 @@ FocusScope {
 
     Keys.onPressed: event => {
         const action = mainInst?.actionForKeyEvent(event) ?? "";
-        if (action !== "" && (mainInst?.enabled ?? true)) {
+        if (action !== "") {
             root.flashButton(action);
         }
         if (mainInst?.handleKeyEvent(event)) {
@@ -85,8 +85,6 @@ FocusScope {
     }
 
     function buttonFill(buttonData, hovered, active) {
-        const disabled = !(mainInst?.enabled ?? true);
-        if (disabled) return Qt.alpha(Color.mSurfaceVariant, 0.55);
         if (active) {
             if (buttonData.tone === "accent") return Qt.darker(Color.mPrimary, 1.12);
             if (buttonData.tone === "danger") return Qt.alpha(Color.mError, 0.22);
@@ -106,8 +104,6 @@ FocusScope {
     }
 
     function buttonBorder(buttonData, hovered, active) {
-        const disabled = !(mainInst?.enabled ?? true);
-        if (disabled) return Qt.alpha(Color.mOutline, 0.45);
         if (active) {
             if (buttonData.tone === "danger") return Qt.alpha(Color.mError, 0.85);
             return Color.mPrimary;
@@ -118,8 +114,6 @@ FocusScope {
     }
 
     function buttonTextColor(buttonData) {
-        const disabled = !(mainInst?.enabled ?? true);
-        if (disabled) return Qt.alpha(Color.mOnSurface, 0.45);
         if (buttonData.tone === "accent") return Color.mOnPrimary;
         if (buttonData.tone === "danger") return Color.mError;
         if (buttonData.tone === "operator") return Color.mPrimary;
@@ -149,17 +143,19 @@ FocusScope {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Style.marginS
+                        spacing: Style.marginM
 
                         NIcon {
                             icon: "calculator"
                             pointSize: Style.fontSizeL
                             color: Color.mPrimary
+                            Layout.alignment: Qt.AlignVCenter
                         }
 
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 2
+                            Layout.alignment: Qt.AlignVCenter
+                            spacing: 4
 
                             NText {
                                 text: t("panel.title")
@@ -167,15 +163,11 @@ FocusScope {
                                 font.bold: true
                                 color: Color.mOnSurface
                             }
-                        }
 
-                        NToggle {
-                            checked: mainInst?.enabled ?? true
-                            onToggled: checked => {
-                                if (!pluginApi?.pluginSettings) return;
-                                pluginApi.pluginSettings.enabled = checked;
-                                pluginApi.saveSettings();
-                                root.forceActiveFocus();
+                            NText {
+                                Layout.fillWidth: true
+                                text: t("panel.subtitle")
+                                color: Qt.alpha(Color.mOnSurface, 0.68)
                             }
                         }
                     }
@@ -257,8 +249,7 @@ FocusScope {
                                     id: buttonMouse
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    cursorShape: (mainInst?.enabled ?? true) ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    enabled: mainInst?.enabled ?? true
+                                    cursorShape: Qt.PointingHandCursor
 
                                     onClicked: {
                                         mainInst?.pressButton(modelData.action);

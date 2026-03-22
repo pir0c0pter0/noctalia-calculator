@@ -34,12 +34,6 @@ Item {
     readonly property color contentColor: isSelected
         ? Color.mOnPrimary
         : (mouseArea.containsMouse ? Color.mOnHover : Color.mOnSurface)
-    readonly property color statusColor: {
-        if (!(mainInst?.enabled ?? true)) return Color.mOutline;
-        if (mainInst?.errorState ?? false) return Color.mError;
-        return (mainInst?.hasExpression ?? false) ? Color.mPrimary : Color.mSecondary;
-    }
-
     implicitWidth: visualCapsule.width
     implicitHeight: visualCapsule.height
 
@@ -47,11 +41,6 @@ Item {
         id: contextMenu
 
         model: [
-            {
-                "label": mainInst?.enabled ? mainInst?.t("bar.disable") : mainInst?.t("bar.enable"),
-                "action": "toggle",
-                "icon": mainInst?.enabled ? "player-pause" : "player-play"
-            },
             {
                 "label": mainInst?.t("bar.clear"),
                 "action": "clear",
@@ -68,10 +57,7 @@ Item {
             contextMenu.close();
             PanelService.closeContextMenu(root.screen);
 
-            if (action === "toggle" && pluginApi?.pluginSettings) {
-                pluginApi.pluginSettings.enabled = !(mainInst?.enabled ?? true);
-                pluginApi.saveSettings();
-            } else if (action === "clear") {
+            if (action === "clear") {
                 mainInst?.clearAll();
             } else if (action === "settings") {
                 BarService.openPluginSettings(root.screen, pluginApi.manifest);
@@ -97,7 +83,6 @@ Item {
             NIcon {
                 icon: "calculator"
                 color: root.contentColor
-                opacity: mainInst?.enabled ? 1.0 : 0.4
             }
 
             NText {
@@ -107,18 +92,6 @@ Item {
                 pointSize: Style.fontSizeS
                 color: root.contentColor
             }
-        }
-
-        Rectangle {
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            anchors.bottomMargin: 2
-            anchors.rightMargin: 2
-            width: 8
-            height: 8
-            radius: 4
-            color: root.statusColor
-            visible: mainInst !== null
         }
     }
 

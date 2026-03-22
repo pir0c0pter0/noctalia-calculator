@@ -64,7 +64,6 @@ widget_entry = {
     "id": f"plugin:{plugin_id}",
     "commandPrefix": "calculator",
     "defaultSettings": {
-        "enabled": True,
         "language": "auto",
         "precision": 8,
         "showBarValue": True

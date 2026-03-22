@@ -19,7 +19,6 @@
   "metadata": {
     "commandPrefix": "calculator",
     "defaultSettings": {
-      "enabled": true,
       "showBarValue": true,
       "precision": 8,
       "language": "auto"

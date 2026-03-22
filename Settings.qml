@@ -9,7 +9,6 @@ ColumnLayout {
     property var pluginApi: null
     readonly property var mainInst: pluginApi?.mainInstance ?? null
 
-    property bool valueEnabled: pluginApi?.pluginSettings?.enabled ?? true
     property bool valueShowBarValue: pluginApi?.pluginSettings?.showBarValue ?? true
     property int valuePrecision: pluginApi?.pluginSettings?.precision ?? 8
     property string valueLanguage: pluginApi?.pluginSettings?.language ?? "auto"
@@ -32,7 +31,6 @@ ColumnLayout {
 
     function saveSettings() {
         if (!pluginApi?.pluginSettings) return;
-        pluginApi.pluginSettings.enabled = valueEnabled;
         pluginApi.pluginSettings.showBarValue = valueShowBarValue;
         pluginApi.pluginSettings.precision = valuePrecision;
         pluginApi.pluginSettings.language = valueLanguage;
@@ -100,17 +98,6 @@ ColumnLayout {
 
     NToggle {
         Layout.fillWidth: true
-        label: t("settings.enabled")
-        description: t("settings.enabled-desc")
-        checked: root.valueEnabled
-        onToggled: checked => {
-            root.valueEnabled = checked;
-            root.saveSettings();
-        }
-    }
-
-    NToggle {
-        Layout.fillWidth: true
         label: t("settings.show-bar")
         description: t("settings.show-bar-desc")
         checked: root.valueShowBarValue
@@ -155,7 +142,7 @@ ColumnLayout {
             spacing: Style.marginXS
 
             NText {
-                text: t("settings.shortcuts")
+                text: t("settings.info")
                 font.bold: true
                 color: Color.mPrimary
             }
@@ -163,6 +150,13 @@ ColumnLayout {
             NText {
                 Layout.fillWidth: true
                 text: t("settings.shortcuts-desc")
+                wrapMode: Text.WordWrap
+                color: Qt.alpha(Color.mOnSurface, 0.75)
+            }
+
+            NText {
+                Layout.fillWidth: true
+                text: t("settings.developed-by")
                 wrapMode: Text.WordWrap
                 color: Qt.alpha(Color.mOnSurface, 0.75)
             }

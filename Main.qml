@@ -9,7 +9,6 @@ Item {
     readonly property var settings: pluginApi?.pluginSettings ?? ({})
     readonly property var defaults: pluginApi?.manifest?.metadata?.defaultSettings ?? ({})
 
-    readonly property bool enabled: settings.enabled ?? defaults.enabled ?? true
     readonly property bool showBarValue: settings.showBarValue ?? defaults.showBarValue ?? true
     readonly property int precision: settings.precision ?? defaults.precision ?? 8
     readonly property string language: settings.language ?? defaults.language ?? "auto"
@@ -28,17 +27,14 @@ Item {
     readonly property bool hasExpression: tokens.length > 0 || currentInput !== "0" || justEvaluated
     readonly property string displayText: errorState ? t("state.error") : currentInput
     readonly property string expressionText: expressionPreview()
-    readonly property string badgeText: (!enabled || !showBarValue) ? "" : compactDisplay(displayText, 9)
+    readonly property string badgeText: !showBarValue ? "" : compactDisplay(displayText, 9)
 
     readonly property var _enStrings: ({
         "state": {
             "ready": "Ready",
-            "disabled": "Disabled",
             "error": "Error"
         },
         "bar": {
-            "enable": "Enable Calculator",
-            "disable": "Disable Calculator",
             "clear": "Clear",
             "settings": "Settings",
             "tooltip-title": "Calculator",
@@ -51,12 +47,10 @@ Item {
             "keyboard-hint": "Enter = solve   Backspace = delete   Esc = clear",
             "mouse-hint": "Click any key below or type directly.",
             "expression-idle": "Start typing or click a button",
-            "disabled-note": "The calculator is disabled. Use the toggle to turn it back on.",
             "live-value": "Live value"
         },
         "settings": {
-            "enabled": "Enable calculator",
-            "enabled-desc": "Keep the calculator active in the bar and panel",
+            "info": "Information",
             "show-bar": "Show value in bar",
             "show-bar-desc": "Display the current value next to the calculator icon",
             "precision": "Decimal precision",
@@ -65,21 +59,19 @@ Item {
             "language-desc": "Plugin display language",
             "lang-auto": "Auto",
             "lang-en": "English",
-            "lang-pt": "Portuguese",
+            "lang-pt": "Portuguese (Brazil)",
             "shortcuts": "Shortcuts",
-            "shortcuts-desc": "Panel toggle on Niri: Mod+Shift+C. Input: numbers, operators, Enter, Backspace, Esc/Delete, % and F9."
+            "shortcuts-desc": "Panel toggle on Niri: Mod+Shift+C. Input: numbers, operators, Enter, Backspace, Esc/Delete, % and F9.",
+            "developed-by": "Developed by Pir0c0pter0"
         }
     })
 
     readonly property var _ptStrings: ({
         "state": {
             "ready": "Pronta",
-            "disabled": "Desativada",
             "error": "Erro"
         },
         "bar": {
-            "enable": "Ativar calculadora",
-            "disable": "Desativar calculadora",
             "clear": "Limpar",
             "settings": "Configuracoes",
             "tooltip-title": "Calculadora",
@@ -92,12 +84,10 @@ Item {
             "keyboard-hint": "Enter = calcular   Backspace = apagar   Esc = limpar",
             "mouse-hint": "Clique nas teclas abaixo ou digite direto.",
             "expression-idle": "Comece digitando ou clique em um botao",
-            "disabled-note": "A calculadora esta desativada. Use o toggle para ligar de novo.",
             "live-value": "Valor ao vivo"
         },
         "settings": {
-            "enabled": "Ativar calculadora",
-            "enabled-desc": "Mantem a calculadora ativa na barra e no painel",
+            "info": "Informacoes",
             "show-bar": "Mostrar valor na barra",
             "show-bar-desc": "Exibe o valor atual ao lado do icone da calculadora",
             "precision": "Precisao decimal",
@@ -106,9 +96,10 @@ Item {
             "language-desc": "Idioma de exibicao do plugin",
             "lang-auto": "Auto",
             "lang-en": "Ingles",
-            "lang-pt": "Portugues",
+            "lang-pt": "Portugues (Brasil)",
             "shortcuts": "Atalhos",
-            "shortcuts-desc": "Abrir painel no Niri: Mod+Shift+C. Entrada: numeros, operadores, Enter, Backspace, Esc/Delete, % e F9."
+            "shortcuts-desc": "Abrir painel no Niri: Mod+Shift+C. Entrada: numeros, operadores, Enter, Backspace, Esc/Delete, % e F9.",
+            "developed-by": "Desenvolvido por Pir0c0pter0"
         }
     })
 
@@ -232,7 +223,6 @@ Item {
     }
 
     function appendDigit(digit) {
-        if (!enabled) return;
         if (errorState) _resetAfterError();
 
         if (justEvaluated && tokens.length === 0 && !shouldResetInput) {
@@ -260,7 +250,6 @@ Item {
     }
 
     function appendDecimal() {
-        if (!enabled) return;
         if (errorState) _resetAfterError();
 
         if (justEvaluated && tokens.length === 0 && !shouldResetInput) {
@@ -281,7 +270,6 @@ Item {
     }
 
     function deleteLastChar() {
-        if (!enabled) return;
         if (errorState) {
             clearAll();
             return;
@@ -305,7 +293,7 @@ Item {
     }
 
     function toggleSign() {
-        if (!enabled || errorState) return;
+        if (errorState) return;
 
         if (shouldResetInput) {
             currentInput = "0";
@@ -327,7 +315,7 @@ Item {
     }
 
     function applyPercent() {
-        if (!enabled || errorState) return;
+        if (errorState) return;
 
         const numeric = Number(_sanitizeCurrentInput());
         if (Number.isNaN(numeric)) {
@@ -347,7 +335,7 @@ Item {
     }
 
     function applyOperator(op) {
-        if (!enabled || errorState) return;
+        if (errorState) return;
 
         const operator = _normalizeOperator(op);
         if (!operator) return;
@@ -474,7 +462,7 @@ Item {
     }
 
     function evaluate() {
-        if (!enabled || errorState) return;
+        if (errorState) return;
 
         const evaluationTokens = _buildEvaluationTokens();
         if (evaluationTokens.length === 0) return;
@@ -501,8 +489,6 @@ Item {
     }
 
     function pressButton(action) {
-        if (!enabled && action !== "toggle-enabled") return;
-
         if (action >= "0" && action <= "9") {
             appendDigit(action);
             return;
@@ -562,8 +548,6 @@ Item {
     }
 
     function handleKeyEvent(event) {
-        if (!enabled) return false;
-
         const action = actionForKeyEvent(event);
         if (action === "") return false;
 
@@ -573,10 +557,6 @@ Item {
 
     function tooltipText() {
         let text = t("bar.tooltip-title");
-        if (!enabled) {
-            return text + "\n" + t("state.disabled");
-        }
-
         text += "\n" + expressionText;
         if (expressionText !== displayText) {
             text += "\n= " + displayText;
