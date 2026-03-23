@@ -15,8 +15,8 @@
     "about": "Sobre",
     "show-bar": "Mostrar valor na barra",
     "show-bar-desc": "Exibe o valor atual ao lado do icone da calculadora",
-    "precision": "Precisao decimal",
+    "precision": "Precisao decimal: {value}",
     "precision-desc": "Maximo de casas decimais ao formatar resultados",
-    "developed-by": "Desenvolvido por Pir0c0pter0"
+    "developed-by": "Desenvolvido por Pir0c0pter0<br>v{version}"
   }
 }

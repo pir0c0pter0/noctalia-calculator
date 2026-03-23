@@ -15,8 +15,8 @@
     "about": "Ueber",
     "show-bar": "Wert in der Leiste anzeigen",
     "show-bar-desc": "Zeigt den aktuellen Wert neben dem Rechner-Symbol an",
-    "precision": "Dezimalgenauigkeit",
+    "precision": "Dezimalgenauigkeit: {value}",
     "precision-desc": "Maximale Dezimalstellen bei der Ergebnisformatierung",
-    "developed-by": "Entwickelt von Pir0c0pter0"
+    "developed-by": "Entwickelt von Pir0c0pter0<br>v{version}"
   }
 }

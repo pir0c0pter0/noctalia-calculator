@@ -15,8 +15,8 @@
     "about": "このプラグインについて",
     "show-bar": "バーに数値を表示",
     "show-bar-desc": "電卓アイコンの横に現在の値を表示します",
-    "precision": "小数精度",
+    "precision": "小数精度: {value}",
     "precision-desc": "結果のフォーマット時の最大小数桁数",
-    "developed-by": "Pir0c0pter0 が開発"
+    "developed-by": "Pir0c0pter0 が開発<br>v{version}"
   }
 }

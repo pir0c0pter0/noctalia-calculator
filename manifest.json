@@ -18,7 +18,6 @@
     "plugins": []
   },
   "metadata": {
-    "commandPrefix": "calculator",
     "defaultSettings": {
       "showBarValue": true,
       "precision": 8

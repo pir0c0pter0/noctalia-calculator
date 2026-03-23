@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import "AdvancedMath.js" as AdvancedMath
 
 Item {
     id: root
@@ -23,7 +24,7 @@ Item {
     property string lastExpression: ""
 
     readonly property bool hasExpression: tokens.length > 0 || currentInput !== "0" || justEvaluated
-    readonly property string displayText: errorState ? (pluginApi?.tr("state.error") ?? "Error") : currentInput
+    readonly property string displayText: errorState ? pluginApi?.tr("state.error") : currentInput
     readonly property string expressionText: expressionPreview()
     readonly property string badgeText: !showBarValue ? "" : compactDisplay(displayText, 9)
 
@@ -40,6 +41,7 @@ Item {
     function _sanitizeCurrentInput() {
         if (currentInput === "" || currentInput === "-") return "0";
         if (currentInput.endsWith(".")) return currentInput + "0";
+        // Preserve "-0" so subsequent digit input keeps the negative sign
         if (currentInput === "-0") return "-0";
         return currentInput;
     }
@@ -256,61 +258,12 @@ Item {
         return built;
     }
 
-    // Uses imperative mutation on local arrays for shunting-yard;
-    // these arrays never escape this function scope.
-    function _applyTopOperator(values, operators) {
-        if (values.length < 2 || operators.length < 1) return false;
-
-        const operator = operators.pop();
-        const right = values.pop();
-        const left = values.pop();
-        let result = 0;
-
-        if (operator === "+") result = left + right;
-        else if (operator === "-") result = left - right;
-        else if (operator === "*") result = left * right;
-        else if (operator === "/") {
-            if (right === 0) return false;
-            result = left / right;
+    function _evaluateExpression(expressionStr) {
+        try {
+            return AdvancedMath.evaluate(expressionStr);
+        } catch (e) {
+            return null;
         }
-
-        if (!Number.isFinite(result)) return false;
-        values.push(result);
-        return true;
-    }
-
-    function _operatorPrecedence(operator) {
-        if (operator === "+" || operator === "-") return 1;
-        if (operator === "*" || operator === "/") return 2;
-        return 0;
-    }
-
-    function _evaluateTokenArray(evaluationTokens) {
-        const values = [];
-        const operators = [];
-
-        for (let i = 0; i < evaluationTokens.length; i++) {
-            const token = evaluationTokens[i];
-            if (_isOperator(token)) {
-                while (operators.length > 0
-                        && _operatorPrecedence(operators[operators.length - 1]) >= _operatorPrecedence(token)) {
-                    if (!_applyTopOperator(values, operators)) return null;
-                }
-                operators.push(token);
-                continue;
-            }
-
-            const numeric = Number(token);
-            if (Number.isNaN(numeric)) return null;
-            values.push(numeric);
-        }
-
-        while (operators.length > 0) {
-            if (!_applyTopOperator(values, operators)) return null;
-        }
-
-        if (values.length !== 1 || !Number.isFinite(values[0])) return null;
-        return values[0];
     }
 
     function _formatExpression(tokensToFormat) {
@@ -341,7 +294,8 @@ Item {
         if (evaluationTokens.length === 0) return;
 
         const expression = _formatExpression(evaluationTokens);
-        const result = _evaluateTokenArray(evaluationTokens);
+        const expressionStr = evaluationTokens.join(" ");
+        const result = _evaluateExpression(expressionStr);
         if (result === null) {
             _setError();
             return;

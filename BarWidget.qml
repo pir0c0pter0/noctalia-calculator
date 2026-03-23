@@ -42,12 +42,12 @@ Item {
 
         model: [
             {
-                "label": pluginApi?.tr("bar.clear") ?? "Clear",
+                "label": pluginApi?.tr("bar.clear"),
                 "action": "clear",
                 "icon": "trash"
             },
             {
-                "label": pluginApi?.tr("bar.settings") ?? "Settings",
+                "label": pluginApi?.tr("bar.settings"),
                 "action": "settings",
                 "icon": "settings"
             }
@@ -114,7 +114,7 @@ Item {
         onEntered: {
             TooltipService.show(
                 root,
-                pluginApi?.tr("bar.tooltip-title") ?? "Calculator",
+                pluginApi?.tr("bar.tooltip-title"),
                 BarService.getTooltipDirection(root)
             );
         }

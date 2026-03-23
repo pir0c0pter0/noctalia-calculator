@@ -145,7 +145,7 @@ FocusScope {
                             spacing: Style.marginS
 
                             NText {
-                                text: pluginApi?.tr("panel.title") ?? "Calculator"
+                                text: pluginApi?.tr("panel.title")
                                 pointSize: Style.fontSizeL
                                 font.bold: true
                                 color: Color.mOnSurface
@@ -153,7 +153,7 @@ FocusScope {
 
                             NText {
                                 Layout.fillWidth: true
-                                text: pluginApi?.tr("panel.subtitle") ?? "Quick math in the bar"
+                                text: pluginApi?.tr("panel.subtitle")
                                 color: Qt.alpha(Color.mOnSurface, 0.68)
                             }
                         }
@@ -161,12 +161,12 @@ FocusScope {
 
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: expressionLabel.visible ? 92 : 72
+                        Layout.preferredHeight: Math.round((expressionLabel.visible ? 92 : 72) * Style.uiScaleRatio)
                         Layout.minimumHeight: Layout.preferredHeight
                         radius: Style.radiusL
                         color: Qt.alpha(Color.mPrimary, 0.08)
                         border.color: root.activeFocus ? Qt.alpha(Color.mPrimary, 0.8) : Qt.alpha(Color.mOutline, 0.65)
-                        border.width: 1
+                        border.width: Style.borderS
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -210,14 +210,14 @@ FocusScope {
 
                                 Layout.fillWidth: true
                                 Layout.columnSpan: modelData.span
-                                Layout.preferredHeight: modelData.action === "equals" ? 58 : 52
+                                Layout.preferredHeight: Math.round((modelData.action === "equals" ? 58 : 52) * Style.uiScaleRatio)
                                 Layout.minimumHeight: Layout.preferredHeight
 
                                 readonly property bool isFlashed: root.flashedAction === modelData.action
                                 radius: Style.radiusL
                                 color: root.buttonFill(modelData, buttonMouse.containsMouse, isFlashed)
                                 border.color: root.buttonBorder(modelData, buttonMouse.containsMouse, isFlashed)
-                                border.width: 1
+                                border.width: Style.borderS
                                 scale: isFlashed ? 0.96 : 1.0
 
                                 Behavior on color { ColorAnimation { duration: Style.animationFast } }
