@@ -42,12 +42,12 @@ Item {
 
         model: [
             {
-                "label": mainInst?.t("bar.clear"),
+                "label": pluginApi?.tr("bar.clear") ?? "Clear",
                 "action": "clear",
                 "icon": "trash"
             },
             {
-                "label": mainInst?.t("bar.settings"),
+                "label": pluginApi?.tr("bar.settings") ?? "Settings",
                 "action": "settings",
                 "icon": "settings"
             }
@@ -78,7 +78,7 @@ Item {
         Row {
             id: iconRow
             anchors.centerIn: parent
-            spacing: badge !== "" ? 6 : 0
+            spacing: badge !== "" ? Style.marginS : 0
 
             NIcon {
                 icon: "calculator"
@@ -107,19 +107,18 @@ Item {
             if (mouse.button === Qt.RightButton) {
                 PanelService.showContextMenu(contextMenu, root, root.screen);
             } else if (pluginApi) {
-                pluginApi.openPanel(root.screen, root);
+                pluginApi.togglePanel(root.screen, root);
             }
         }
 
         onEntered: {
             TooltipService.show(
                 root,
-                mainInst?.t("bar.tooltip-title") ?? "Calculadora",
+                pluginApi?.tr("bar.tooltip-title") ?? "Calculator",
                 BarService.getTooltipDirection(root)
             );
         }
 
         onExited: TooltipService.hide()
-
     }
 }

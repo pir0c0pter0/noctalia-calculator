@@ -18,7 +18,6 @@ FocusScope {
     readonly property var mainInst: pluginApi?.mainInstance ?? null
     property string flashedAction: ""
 
-    property int _langVersion: 0
     readonly property var buttonModel: [
         { "label": "AC", "action": "clear", "tone": "danger", "span": 1 },
         { "label": "+/-", "action": "sign", "tone": "operator", "span": 1 },
@@ -41,13 +40,6 @@ FocusScope {
         { "label": "+", "action": "add", "tone": "operator", "span": 1 },
         { "label": "=", "action": "equals", "tone": "accent", "span": 4 }
     ]
-
-    Connections {
-        target: mainInst
-        function onTranslationVersionChanged() {
-            root._langVersion++;
-        }
-    }
 
     Timer {
         id: flashTimer
@@ -72,11 +64,6 @@ FocusScope {
         if (mainInst?.handleKeyEvent(event)) {
             event.accepted = true;
         }
-    }
-
-    function t(key) {
-        if (_langVersion < 0) return key;
-        return mainInst?.translate(key) ?? key;
     }
 
     function flashButton(action) {
@@ -155,10 +142,10 @@ FocusScope {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter
-                            spacing: 4
+                            spacing: Style.marginS
 
                             NText {
-                                text: t("panel.title")
+                                text: pluginApi?.tr("panel.title") ?? "Calculator"
                                 pointSize: Style.fontSizeL
                                 font.bold: true
                                 color: Color.mOnSurface
@@ -166,7 +153,7 @@ FocusScope {
 
                             NText {
                                 Layout.fillWidth: true
-                                text: t("panel.subtitle")
+                                text: pluginApi?.tr("panel.subtitle") ?? "Quick math in the bar"
                                 color: Qt.alpha(Color.mOnSurface, 0.68)
                             }
                         }

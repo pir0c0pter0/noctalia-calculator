@@ -12,31 +12,13 @@ PLUGINS_FILE="${NOCTALIA_DIR}/plugins.json"
 SETTINGS_FILE="${NOCTALIA_DIR}/settings.json"
 NIRI_KEYBINDS_FILE="${CONFIG_HOME}/niri/cfg/keybinds.kdl"
 
-python3 - "$PLUGINS_FILE" "$SETTINGS_FILE" "$PLUGIN_ID" <<'PY'
-import json
-import os
+python3 - "$PLUGINS_FILE" "$SETTINGS_FILE" "$PLUGIN_ID" "$SCRIPT_DIR" <<'PY'
 import sys
+sys.path.insert(0, sys.argv[4])
+from _utils import load_json, save_json
 
 plugins_file, settings_file, plugin_id = sys.argv[1:4]
 widget_id = f"plugin:{plugin_id}"
-
-
-def load_json(path, default):
-    if not os.path.exists(path):
-        return default
-    with open(path, "r", encoding="utf-8") as handle:
-        content = handle.read().strip()
-    if not content:
-        return default
-    return json.loads(content)
-
-
-def save_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(data, handle, indent=2, ensure_ascii=True)
-        handle.write("\n")
-
 
 plugins = load_json(plugins_file, {})
 if plugin_id in plugins:
@@ -58,10 +40,13 @@ for section in ("left", "center", "right"):
 save_json(settings_file, settings)
 PY
 
-python3 - "$NIRI_KEYBINDS_FILE" <<'PY'
+python3 - "$NIRI_KEYBINDS_FILE" "$SCRIPT_DIR" <<'PY'
 import os
 import re
 import sys
+
+sys.path.insert(0, sys.argv[2])
+from _utils import save_file
 
 keybinds_file = sys.argv[1]
 managed_pattern = re.compile(
@@ -75,11 +60,11 @@ with open(keybinds_file, "r", encoding="utf-8") as handle:
     content = handle.read()
 
 updated = managed_pattern.sub("", content, count=1)
+# Normalize excessive blank lines only around the removed block area
 updated = re.sub(r"\n{3,}", "\n\n", updated)
 
 if updated != content:
-    with open(keybinds_file, "w", encoding="utf-8") as handle:
-        handle.write(updated)
+    save_file(keybinds_file, updated)
     print('Removed managed Niri keybind: Mod+Shift+C')
 PY
 

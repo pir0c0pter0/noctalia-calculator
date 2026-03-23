@@ -13,21 +13,7 @@ ColumnLayout {
     property int valuePrecision: pluginApi?.pluginSettings?.precision ?? 8
     property string valueLanguage: pluginApi?.pluginSettings?.language ?? "auto"
 
-    property int _langVersion: 0
-
-    Connections {
-        target: mainInst
-        function onTranslationVersionChanged() {
-            root._langVersion++;
-        }
-    }
-
     spacing: Style.marginM
-
-    function t(key) {
-        if (_langVersion < 0) return key;
-        return mainInst?.translate(key) ?? key;
-    }
 
     function saveSettings() {
         if (!pluginApi?.pluginSettings) return;
@@ -35,7 +21,6 @@ ColumnLayout {
         pluginApi.pluginSettings.precision = valuePrecision;
         pluginApi.pluginSettings.language = valueLanguage;
         pluginApi.saveSettings();
-        mainInst?.reloadLanguage(valueLanguage);
     }
 
     ColumnLayout {
@@ -43,8 +28,8 @@ ColumnLayout {
         spacing: Style.marginS
 
         NLabel {
-            label: t("settings.language")
-            description: t("settings.language-desc")
+            label: pluginApi?.tr("settings.language") ?? "Language"
+            description: pluginApi?.tr("settings.language-desc") ?? "Plugin display language"
         }
 
         RowLayout {
@@ -59,9 +44,9 @@ ColumnLayout {
                     readonly property string langCode: modelData
                     readonly property bool isSelected: root.valueLanguage === langCode
                     readonly property string langLabel: {
-                        if (langCode === "auto") return root.t("settings.lang-auto");
-                        if (langCode === "en") return root.t("settings.lang-en");
-                        return root.t("settings.lang-pt");
+                        if (langCode === "auto") return pluginApi?.tr("settings.lang-auto") ?? "Auto";
+                        if (langCode === "en") return pluginApi?.tr("settings.lang-en") ?? "English";
+                        return pluginApi?.tr("settings.lang-pt") ?? "Portuguese (Brazil)";
                     }
 
                     Layout.fillWidth: true
@@ -98,8 +83,8 @@ ColumnLayout {
 
     NToggle {
         Layout.fillWidth: true
-        label: t("settings.show-bar")
-        description: t("settings.show-bar-desc")
+        label: pluginApi?.tr("settings.show-bar") ?? "Show value in bar"
+        description: pluginApi?.tr("settings.show-bar-desc") ?? "Display the current value next to the calculator icon"
         checked: root.valueShowBarValue
         onToggled: checked => {
             root.valueShowBarValue = checked;
@@ -112,8 +97,8 @@ ColumnLayout {
         spacing: Style.marginS
 
         NLabel {
-            label: t("settings.precision") + ": " + root.valuePrecision
-            description: t("settings.precision-desc")
+            label: (pluginApi?.tr("settings.precision") ?? "Decimal precision") + ": " + root.valuePrecision
+            description: pluginApi?.tr("settings.precision-desc") ?? "Maximum decimals used when formatting results"
         }
 
         NSlider {
@@ -131,7 +116,9 @@ ColumnLayout {
 
     NLabel {
         Layout.fillWidth: true
-        label: t("settings.about")
-        description: t("settings.developed-by") + "<br>" + t("settings.auto-language-desc")
+        label: pluginApi?.tr("settings.about") ?? "About"
+        description: (pluginApi?.tr("settings.developed-by") ?? "Developed by Pir0c0pter0")
+            + "<br>v" + (pluginApi?.manifest?.version ?? "1.0.0")
+            + "<br>" + (pluginApi?.tr("settings.auto-language-desc") ?? "Automatic translation follows your system language while Auto is selected.")
     }
 }

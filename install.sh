@@ -21,32 +21,20 @@ fi
 
 if [ "$SCRIPT_DIR" != "$TARGET_DIR" ]; then
   ln -sfn "$SCRIPT_DIR" "$TARGET_DIR"
+  # Verify symlink points where intended
+  actual_target="$(readlink -f "$TARGET_DIR")"
+  if [ "$actual_target" != "$SCRIPT_DIR" ]; then
+    printf 'Symlink verification failed. Expected %s, got %s\n' "$SCRIPT_DIR" "$actual_target" >&2
+    exit 1
+  fi
 fi
 
-python3 - "$PLUGINS_FILE" "$SETTINGS_FILE" "$PLUGIN_ID" <<'PY'
-import json
-import os
+python3 - "$PLUGINS_FILE" "$SETTINGS_FILE" "$PLUGIN_ID" "$SCRIPT_DIR" <<'PY'
 import sys
+sys.path.insert(0, sys.argv[4])
+from _utils import load_json, save_json
 
 plugins_file, settings_file, plugin_id = sys.argv[1:4]
-
-
-def load_json(path, default):
-    if not os.path.exists(path):
-        return default
-    with open(path, "r", encoding="utf-8") as handle:
-        content = handle.read().strip()
-    if not content:
-        return default
-    return json.loads(content)
-
-
-def save_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(data, handle, indent=2, ensure_ascii=True)
-        handle.write("\n")
-
 
 plugins = load_json(plugins_file, {})
 plugins[plugin_id] = {
@@ -76,23 +64,19 @@ if not any(item.get("id") == widget_entry["id"] for item in right if isinstance(
 save_json(settings_file, settings)
 PY
 
-python3 - "$NIRI_KEYBINDS_FILE" <<'PY'
+python3 - "$NIRI_KEYBINDS_FILE" "$SCRIPT_DIR" <<'PY'
 import os
 import re
 import sys
+
+sys.path.insert(0, sys.argv[2])
+from _utils import save_file
 
 keybinds_file = sys.argv[1]
 start_marker = "// >>> noctalia-calculator start >>>"
 end_marker = "// <<< noctalia-calculator end <<<"
 binding_line = '    Mod+Shift+C                         hotkey-overlay-title="Calculator: noctalia-calculator" { spawn-sh "qs -c noctalia-shell ipc call plugin togglePanel noctalia-calculator"; }'
 managed_block = "\n".join((start_marker, binding_line, end_marker))
-
-
-def save_file(path, content):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as handle:
-        handle.write(content)
-
 
 if not os.path.exists(keybinds_file):
     print(f'Skipped Niri keybind install: {keybinds_file} not found')
@@ -105,7 +89,8 @@ managed_pattern = re.compile(
     r'(?ms)^[ \t]*// >>> noctalia-calculator start >>>\n.*?^[ \t]*// <<< noctalia-calculator end <<<\n?'
 )
 exact_binding = 'qs -c noctalia-shell ipc call plugin togglePanel noctalia-calculator'
-conflicting_binding = re.search(r'^[ \t]*Mod\+Shift\+C\b.*$', content, re.MULTILINE)
+# Exclude commented-out lines when checking for conflicting bindings
+conflicting_binding = re.search(r'^(?![ \t]*//)[ \t]*Mod\+Shift\+C\b.*$', content, re.MULTILINE)
 
 if managed_pattern.search(content):
     updated = managed_pattern.sub(managed_block + "\n", content, count=1)
@@ -122,9 +107,14 @@ if conflicting_binding:
     print('Skipped Niri keybind install: Mod+Shift+C is already mapped to another command')
     raise SystemExit(0)
 
-binds_close = content.rfind("}")
-if "binds {" not in content or binds_close == -1:
+# Verify we find a binds block (flexible whitespace matching)
+if not re.search(r'binds\s*\{', content):
     print('Skipped Niri keybind install: could not find a binds block in keybinds.kdl')
+    raise SystemExit(0)
+
+binds_close = content.rfind("}")
+if binds_close == -1:
+    print('Skipped Niri keybind install: could not find closing brace in keybinds.kdl')
     raise SystemExit(0)
 
 prefix = content[:binds_close].rstrip("\n")

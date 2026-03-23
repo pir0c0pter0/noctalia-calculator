@@ -10,12 +10,11 @@ Item {
     readonly property var defaults: pluginApi?.manifest?.metadata?.defaultSettings ?? ({})
 
     readonly property bool showBarValue: settings.showBarValue ?? defaults.showBarValue ?? true
-    readonly property int precision: settings.precision ?? defaults.precision ?? 8
+    readonly property int precision: Math.max(0, Math.min(settings.precision ?? defaults.precision ?? 8, 10))
     readonly property string language: settings.language ?? defaults.language ?? "auto"
 
-    property string _currentLang: ""
-    property int translationVersion: 0
-    property var _translations: _enStrings
+    // Max digits before JS double precision loses accuracy
+    readonly property int _maxInputLength: 18
 
     property var tokens: []
     property string currentInput: "0"
@@ -25,130 +24,9 @@ Item {
     property string lastExpression: ""
 
     readonly property bool hasExpression: tokens.length > 0 || currentInput !== "0" || justEvaluated
-    readonly property string displayText: errorState ? t("state.error") : currentInput
+    readonly property string displayText: errorState ? (pluginApi?.tr("state.error") ?? "Error") : currentInput
     readonly property string expressionText: expressionPreview()
     readonly property string badgeText: !showBarValue ? "" : compactDisplay(displayText, 9)
-
-    readonly property var _enStrings: ({
-        "state": {
-            "ready": "Ready",
-            "error": "Error"
-        },
-        "bar": {
-            "clear": "Clear",
-            "settings": "Settings",
-            "tooltip-title": "Calculator",
-            "tooltip-shortcuts": "Keyboard: numbers, + - * /, Enter, Backspace, Esc"
-        },
-        "panel": {
-            "title": "Calculator",
-            "subtitle": "Quick math in the bar",
-            "keyboard-ready": "Keyboard ready",
-            "keyboard-hint": "Enter = solve   Backspace = delete   Esc = clear",
-            "mouse-hint": "Click any key below or type directly.",
-            "expression-idle": "Start typing or click a button",
-            "live-value": "Live value"
-        },
-        "settings": {
-            "about": "About",
-            "show-bar": "Show value in bar",
-            "show-bar-desc": "Display the current value next to the calculator icon",
-            "precision": "Decimal precision",
-            "precision-desc": "Maximum decimals used when formatting results",
-            "language": "Language",
-            "language-desc": "Plugin display language",
-            "lang-auto": "Auto",
-            "lang-en": "English",
-            "lang-pt": "Portuguese (Brazil)",
-            "developed-by": "Developed by Pir0c0pter0",
-            "auto-language-desc": "Automatic translation follows your system language while Auto is selected."
-        }
-    })
-
-    readonly property var _ptStrings: ({
-        "state": {
-            "ready": "Pronta",
-            "error": "Erro"
-        },
-        "bar": {
-            "clear": "Limpar",
-            "settings": "Configuracoes",
-            "tooltip-title": "Calculadora",
-            "tooltip-shortcuts": "Teclado: numeros, + - * /, Enter, Backspace, Esc"
-        },
-        "panel": {
-            "title": "Calculadora",
-            "subtitle": "Conta rapida direto na barra",
-            "keyboard-ready": "Teclado ativo",
-            "keyboard-hint": "Enter = calcular   Backspace = apagar   Esc = limpar",
-            "mouse-hint": "Clique nas teclas abaixo ou digite direto.",
-            "expression-idle": "Comece digitando ou clique em um botao",
-            "live-value": "Valor ao vivo"
-        },
-        "settings": {
-            "about": "Sobre",
-            "show-bar": "Mostrar valor na barra",
-            "show-bar-desc": "Exibe o valor atual ao lado do icone da calculadora",
-            "precision": "Precisao decimal",
-            "precision-desc": "Maximo de casas decimais ao formatar resultados",
-            "language": "Idioma",
-            "language-desc": "Idioma de exibicao do plugin",
-            "lang-auto": "Auto",
-            "lang-en": "Ingles",
-            "lang-pt": "Portugues (Brasil)",
-            "developed-by": "Desenvolvido por Pir0c0pter0",
-            "auto-language-desc": "A traducao automatica segue o idioma do sistema quando Auto estiver selecionado."
-        }
-    })
-
-    Component.onCompleted: _loadTranslations()
-
-    onLanguageChanged: _loadTranslations()
-
-    function _resolveLanguage() {
-        if (language !== "auto") return language;
-        const locale = Qt.locale().name;
-        if (locale.startsWith("pt")) return "pt";
-        return "en";
-    }
-
-    function _loadTranslations() {
-        const lang = _resolveLanguage();
-        if (lang === _currentLang) return;
-        _translations = lang === "pt" ? _ptStrings : _enStrings;
-        _currentLang = lang;
-        translationVersion++;
-    }
-
-    function reloadLanguage(langCode) {
-        let resolved = langCode;
-        if (langCode === "auto") {
-            const locale = Qt.locale().name;
-            resolved = locale.startsWith("pt") ? "pt" : "en";
-        }
-        if (resolved === _currentLang) return;
-        _translations = resolved === "pt" ? _ptStrings : _enStrings;
-        _currentLang = resolved;
-        translationVersion++;
-    }
-
-    function translate(key) {
-        const parts = key.split(".");
-        let current = _translations;
-        for (let i = 0; i < parts.length; i++) {
-            if (!current || typeof current !== "object" || !(parts[i] in current)) {
-                return undefined;
-            }
-            current = current[parts[i]];
-        }
-        return typeof current === "string" ? current : undefined;
-    }
-
-    function t(key) {
-        const version = translationVersion;
-        if (version < 0) return key;
-        return translate(key) ?? key;
-    }
 
     function _isOperator(token) {
         return token === "+" || token === "-" || token === "*" || token === "/";
@@ -172,7 +50,7 @@ Item {
 
         let rounded = value;
         if (precision >= 0) {
-            rounded = Number(value.toFixed(Math.max(0, Math.min(precision, 10))));
+            rounded = Number(value.toFixed(precision));
         }
         if (Object.is(rounded, -0)) rounded = 0;
 
@@ -207,10 +85,6 @@ Item {
         lastExpression = "";
     }
 
-    function _resetAfterError() {
-        clearAll();
-    }
-
     function _setError() {
         tokens = [];
         currentInput = "0";
@@ -221,7 +95,7 @@ Item {
     }
 
     function appendDigit(digit) {
-        if (errorState) _resetAfterError();
+        if (errorState) clearAll();
 
         if (justEvaluated && tokens.length === 0 && !shouldResetInput) {
             clearAll();
@@ -239,7 +113,7 @@ Item {
             currentInput = digit;
         } else if (currentInput === "-0") {
             currentInput = "-" + digit;
-        } else if (currentInput.length < 18) {
+        } else if (currentInput.length < _maxInputLength) {
             currentInput += digit;
         }
 
@@ -248,7 +122,7 @@ Item {
     }
 
     function appendDecimal() {
-        if (errorState) _resetAfterError();
+        if (errorState) clearAll();
 
         if (justEvaluated && tokens.length === 0 && !shouldResetInput) {
             clearAll();
@@ -383,6 +257,8 @@ Item {
         return built;
     }
 
+    // Uses imperative mutation on local arrays for shunting-yard;
+    // these arrays never escape this function scope.
     function _applyTopOperator(values, operators) {
         if (values.length < 2 || operators.length < 1) return false;
 
@@ -504,43 +380,27 @@ Item {
         else if (action === "delete") deleteLastChar();
     }
 
+    readonly property var _operatorActionMap: ({
+        "+": "add", "-": "subtract", "/": "divide",
+        "*": "multiply", "x": "multiply", "X": "multiply"
+    })
+
     function actionForKeyEvent(event) {
         if ((event.modifiers & Qt.ControlModifier) || (event.modifiers & Qt.MetaModifier)) {
             return "";
         }
 
         const text = event.text ?? "";
-        if (text >= "0" && text <= "9") {
-            return text;
-        }
-        if (text === "." || text === ",") {
-            return "decimal";
-        }
-        if (text === "+" || text === "-" || text === "*" || text === "/" || text === "x" || text === "X") {
-            if (text === "+") return "add";
-            if (text === "-") return "subtract";
-            if (text === "/" ) return "divide";
-            return "multiply";
-        }
-        if (text === "%") {
-            return "percent";
-        }
-        if (text === "=") {
-            return "equals";
-        }
+        if (text >= "0" && text <= "9") return text;
+        if (text === "." || text === ",") return "decimal";
+        if (text in _operatorActionMap) return _operatorActionMap[text];
+        if (text === "%") return "percent";
+        if (text === "=") return "equals";
 
-        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-            return "equals";
-        }
-        if (event.key === Qt.Key_Backspace) {
-            return "delete";
-        }
-        if (event.key === Qt.Key_Escape || event.key === Qt.Key_Delete) {
-            return "clear";
-        }
-        if (event.key === Qt.Key_F9) {
-            return "sign";
-        }
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) return "equals";
+        if (event.key === Qt.Key_Backspace) return "delete";
+        if (event.key === Qt.Key_Escape || event.key === Qt.Key_Delete) return "clear";
+        if (event.key === Qt.Key_F9) return "sign";
 
         return "";
     }
@@ -551,15 +411,5 @@ Item {
 
         pressButton(action);
         return true;
-    }
-
-    function tooltipText() {
-        let text = t("bar.tooltip-title");
-        text += "\n" + expressionText;
-        if (expressionText !== displayText) {
-            text += "\n= " + displayText;
-        }
-        text += "\n" + t("bar.tooltip-shortcuts");
-        return text;
     }
 }
