@@ -42,9 +42,9 @@ git checkout -b add-noctalia-calculator
 ```bash
 mkdir -p /tmp/noctalia-plugins-fork/noctalia-calculator
 
-# Copy all plugin files (QML, manifest, i18n, LICENSE, README)
+# Copy all plugin files (QML, JS, manifest, i18n, LICENSE, README)
 cp manifest.json Main.qml BarWidget.qml Panel.qml Settings.qml \
-   README.md LICENSE \
+   AdvancedMath.js README.md LICENSE \
    /tmp/noctalia-plugins-fork/noctalia-calculator/
 
 cp -r i18n /tmp/noctalia-plugins-fork/noctalia-calculator/
@@ -85,6 +85,53 @@ gh pr create --repo noctalia-dev/noctalia-plugins \
 - Once merged, `registry.json` is updated automatically by GitHub Actions
 - The plugin then appears in **Noctalia Settings > Plugins** for all users
 
+## Coding standards for official merge
+
+Rules learned from PR #459 review (reviewer: spiros132):
+
+### Translations
+
+- **No fallbacks:** Do not use `?? "Fallback"` after `pluginApi?.tr()`. The shell handles missing translations.
+  ```qml
+  // WRONG
+  pluginApi?.tr("key") ?? "Fallback"
+  // CORRECT
+  pluginApi?.tr("key")
+  ```
+- **Use interpolation, not concatenation:** Pass dynamic values via the second argument.
+  ```qml
+  // WRONG
+  pluginApi?.tr("label") + ": " + value
+  // CORRECT
+  pluginApi?.tr("label", { "value": value })
+  ```
+  In the i18n JSON files, use `{placeholder}` syntax: `"label": "Precision: {value}"`.
+
+### Styling
+
+- **No hardcoded pixel values.** Use the `Style` singleton for all sizing:
+  - `Style.borderS` instead of `border.width: 1`
+  - `Math.round(N * Style.uiScaleRatio)` for custom heights
+  - `Style.marginS`, `Style.marginM`, etc. for spacing
+  - `Style.radiusL`, `Style.iRadiusM` for border radius
+- Reference: `Commons/Style.qml` in `noctalia-dev/noctalia-shell`
+
+### Manifest
+
+- Only include `commandPrefix` in `metadata` if the plugin has a `LauncherProvider` entry point.
+- Do not include unused entry points or fields.
+
+### Shell Helpers
+
+- The shell exposes shared helpers via `pluginApi.loadHelper(name)`.
+- Use `pluginApi.loadHelper("AdvancedMath")` for math evaluation instead of copying the file locally.
+- Available helpers: `AdvancedMath`, `ColorsConvert`, `ColorList`, `QtObj2JS`, `Debug`, `BluetoothUtils`, `sha256`.
+
+### README
+
+- When submitting to the official repo, remove standalone install/update/remove instructions.
+- Keep only: Features, Usage, Files, Author.
+
 ## Plugin directory structure (required by noctalia-plugins)
 
 ```
@@ -94,9 +141,18 @@ noctalia-calculator/
 ├── BarWidget.qml      # Bar capsule with live badge
 ├── Panel.qml          # Floating calculator panel
 ├── Settings.qml       # Settings UI
-├── i18n/              # Translations
+├── AdvancedMath.js     # Math evaluation (from noctalia-shell)
+├── i18n/              # Translations (10 languages)
 │   ├── en.json
-│   └── pt.json
+│   ├── pt.json
+│   ├── es.json
+│   ├── fr.json
+│   ├── de.json
+│   ├── it.json
+│   ├── ru.json
+│   ├── zh.json
+│   ├── ja.json
+│   └── ko.json
 ├── LICENSE
 └── README.md
 ```

@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import "AdvancedMath.js" as AdvancedMath
 
 Item {
     id: root
@@ -260,7 +259,9 @@ Item {
 
     function _evaluateExpression(expressionStr) {
         try {
-            return AdvancedMath.evaluate(expressionStr);
+            var math = pluginApi ? pluginApi.loadHelper("AdvancedMath") : null;
+            if (!math) return null;
+            return math.evaluate(expressionStr);
         } catch (e) {
             return null;
         }
