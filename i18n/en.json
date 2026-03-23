@@ -17,12 +17,6 @@
     "show-bar-desc": "Display the current value next to the calculator icon",
     "precision": "Decimal precision",
     "precision-desc": "Maximum decimals used when formatting results",
-    "language": "Language",
-    "language-desc": "Plugin display language",
-    "lang-auto": "Auto",
-    "lang-en": "English",
-    "lang-pt": "Portuguese (Brazil)",
-    "developed-by": "Developed by Pir0c0pter0",
-    "auto-language-desc": "Automatic translation follows your system language while Auto is selected."
+    "developed-by": "Developed by Pir0c0pter0"
   }
 }

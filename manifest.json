@@ -21,8 +21,7 @@
     "commandPrefix": "calculator",
     "defaultSettings": {
       "showBarValue": true,
-      "precision": 8,
-      "language": "auto"
+      "precision": 8
     }
   }
 }

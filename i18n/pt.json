@@ -17,12 +17,6 @@
     "show-bar-desc": "Exibe o valor atual ao lado do icone da calculadora",
     "precision": "Precisao decimal",
     "precision-desc": "Maximo de casas decimais ao formatar resultados",
-    "language": "Idioma",
-    "language-desc": "Idioma de exibicao do plugin",
-    "lang-auto": "Auto",
-    "lang-en": "Ingles",
-    "lang-pt": "Portugues (Brasil)",
-    "developed-by": "Desenvolvido por Pir0c0pter0",
-    "auto-language-desc": "A traducao automatica segue o idioma do sistema quando Auto estiver selecionado."
+    "developed-by": "Desenvolvido por Pir0c0pter0"
   }
 }

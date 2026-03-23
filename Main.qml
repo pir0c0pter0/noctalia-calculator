@@ -11,7 +11,6 @@ Item {
 
     readonly property bool showBarValue: settings.showBarValue ?? defaults.showBarValue ?? true
     readonly property int precision: Math.max(0, Math.min(settings.precision ?? defaults.precision ?? 8, 10))
-    readonly property string language: settings.language ?? defaults.language ?? "auto"
 
     // Max digits before JS double precision loses accuracy
     readonly property int _maxInputLength: 18
