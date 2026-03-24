@@ -2,13 +2,19 @@
 
 A theme-aware calculator plugin for Noctalia on Niri, with a bar widget, floating panel, keyboard support, and a clean UI that follows the active shell colors.
 
+## Preview
+
+![Calculator Preview](preview.png)
+
 ## Features
 
-- Basic operations: `+`, `-`, `*`, `/`, `%`, sign toggle, clear, and delete
+- Full expression evaluation with operator precedence via `pluginApi.loadHelper("AdvancedMath")`
+- Bar widget with optional live result badge
+- Floating panel with 21-button grid
 - Mouse and keyboard input
-- Optional live value in the bar
 - Theme-aware colors and spacing
-- Multi-language translations
+- 10-language i18n (en, pt, es, fr, de, it, ru, zh, ja, ko)
+- Configurable decimal precision (0-10)
 
 ## Usage
 
@@ -22,13 +28,15 @@ A theme-aware calculator plugin for Noctalia on Niri, with a bar widget, floatin
   - `Backspace` for delete
   - `Esc` or `Delete` for clear
   - `F9` for sign toggle
+  - `%` for percent
 
 ## Files
 
-- `Main.qml`: calculator logic and translations
+- `Main.qml`: calculator logic
 - `BarWidget.qml`: bar widget entry point
 - `Panel.qml`: floating calculator panel
 - `Settings.qml`: plugin settings UI
+- `i18n/`: translations (en, pt, es, fr, de, it, ru, zh, ja, ko)
 
 ## Author
 

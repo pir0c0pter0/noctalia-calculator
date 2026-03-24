@@ -40,8 +40,6 @@ Item {
     function _sanitizeCurrentInput() {
         if (currentInput === "" || currentInput === "-") return "0";
         if (currentInput.endsWith(".")) return currentInput + "0";
-        // Preserve "-0" so subsequent digit input keeps the negative sign
-        if (currentInput === "-0") return "-0";
         return currentInput;
     }
 
