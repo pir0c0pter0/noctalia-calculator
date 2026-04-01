@@ -123,9 +123,9 @@ Rules learned from PR #459 review (reviewer: spiros132):
 
 ### Shell Helpers
 
-- The shell exposes shared helpers via `pluginApi.loadHelper(name)`.
-- Use `pluginApi.loadHelper("AdvancedMath")` for math evaluation instead of copying the file locally.
-- Available helpers: `AdvancedMath`, `ColorsConvert`, `ColorList`, `QtObj2JS`, `Debug`, `BluetoothUtils`, `sha256`.
+- The shell provides helper JS files in `Helpers/` (e.g. `AdvancedMath.js`, `ColorsConvert.js`).
+- Plugins cannot import from the shell directory at runtime; bundle any needed helpers locally.
+- Use `import "AdvancedMath.js" as AdvancedMath` with a local copy of the file.
 
 ### README
 

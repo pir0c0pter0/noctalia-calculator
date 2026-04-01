@@ -8,7 +8,7 @@ A theme-aware calculator plugin for Noctalia on Niri, with a bar widget, floatin
 
 ## Features
 
-- Full expression evaluation with operator precedence via `pluginApi.loadHelper("AdvancedMath")`
+- Full expression evaluation with operator precedence via bundled `AdvancedMath.js`
 - Bar widget with optional live result badge
 - Floating panel with 21-button grid
 - Mouse and keyboard input
@@ -32,7 +32,7 @@ A theme-aware calculator plugin for Noctalia on Niri, with a bar widget, floatin
 
 ## Tests
 
-93 integration tests covering all calculator functions with `AdvancedMath.js` via `pluginApi.loadHelper()`.
+93 integration tests covering all calculator functions with bundled `AdvancedMath.js`.
 
 | Category | Tests | Description |
 |----------|------:|-------------|
@@ -62,6 +62,7 @@ node tests/calculator_test.mjs
 
 ## Files
 
+- `AdvancedMath.js`: math evaluation library (from noctalia-shell Helpers)
 - `Main.qml`: calculator logic
 - `BarWidget.qml`: bar widget entry point
 - `Panel.qml`: floating calculator panel

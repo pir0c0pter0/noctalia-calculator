@@ -3,16 +3,18 @@
 // Simulates the QML environment in pure JS
 // =============================================================================
 
-// --- Load AdvancedMath from noctalia-shell ---
+// --- Load AdvancedMath from plugin directory ---
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const advMathCode = readFileSync(
-  '/home/mariostjr/.config/quickshell/noctalia-shell/Helpers/AdvancedMath.js',
+  join(__dirname, '..', 'AdvancedMath.js'),
   'utf-8'
 );
-const AdvancedMath = {};
-const fn = new Function('module', 'exports', advMathCode + '\nmodule.exports = { evaluate, formatResult, getAvailableFunctions };');
-const mod = { exports: {} };
 // AdvancedMath.js uses top-level function declarations, extract them
 const evalFn = new Function(advMathCode + '\nreturn { evaluate, formatResult, getAvailableFunctions };');
 const mathLib = evalFn();
@@ -22,7 +24,6 @@ const pluginApi = {
   pluginSettings: { showBarValue: true, precision: 8 },
   manifest: { metadata: { defaultSettings: { showBarValue: true, precision: 8 } } },
   tr: (key) => key === "state.error" ? "Error" : key,
-  loadHelper: (name) => name === "AdvancedMath" ? mathLib : null,
 };
 
 // --- Calculator state (simulates QML Item properties) ---
@@ -247,9 +248,7 @@ function createCalculator(api) {
 
   calc._evaluateExpression = (expressionStr) => {
     try {
-      const math = calc.pluginApi ? calc.pluginApi.loadHelper("AdvancedMath") : null;
-      if (!math) return null;
-      return math.evaluate(expressionStr);
+      return mathLib.evaluate(expressionStr);
     } catch (e) {
       return null;
     }
@@ -580,12 +579,12 @@ c.pressButton("3"); c.pressButton("equals");
 assert("Preview after eval", c.lastExpression, "5 + 3");
 
 // =============================================================================
-// 14. ADVANCED MATH DIRECT (evaluate via pluginApi.loadHelper)
+// 14. ADVANCED MATH DIRECT (evaluate via AdvancedMath.js import)
 // =============================================================================
 section("14. AdvancedMath.evaluate (direct)");
 
-const math = pluginApi.loadHelper("AdvancedMath");
-assert("loadHelper returns object", math !== null, true);
+const math = mathLib;
+assert("mathLib loaded", math !== null, true);
 assert("evaluate exists", typeof math.evaluate, "function");
 
 assert("2 + 3", math.evaluate("2 + 3"), 5);
