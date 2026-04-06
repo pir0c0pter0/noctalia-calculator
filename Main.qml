@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import "AdvancedMath.js" as AdvancedMath
 
 Item {
@@ -362,5 +363,16 @@ Item {
 
         pressButton(action);
         return true;
+    }
+
+    IpcHandler {
+        target: "plugin:noctalia-calculator"
+        function toggle() {
+            if (pluginApi) {
+                pluginApi.withCurrentScreen(screen => {
+                    pluginApi.togglePanel(screen);
+                });
+            }
+        }
     }
 }
